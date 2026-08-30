@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=none
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: observer-agent
+  namespace: kagent
+---
+# yaml-language-server: $schema=none
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: observer-agent
+  namespace: demo
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints", "events"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create"]
+---
+# yaml-language-server: $schema=none
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: observer-agent
+  namespace: demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: observer-agent
+subjects:
+  - kind: ServiceAccount
+    name: observer-agent
+    namespace: kagent
+---
+# yaml-language-server: $schema=none
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: observer-agent
+  namespace: kagent
+spec:
+  type: Declarative
+  description: "Read-only SRE observer for the demo namespace."
+  declarative:
+    modelConfig: default-model-config
+    runtime: python
+    systemMessage: |
+      You are a read-only SRE observer for namespace demo.
+      Do not modify cluster state. Use get/describe/list tools only.
+
+      Check pods, events, Service selectors (frontend-svc), Endpoints,
+      and Deployment status. Report root cause and a proposed kubectl
+      patch; do not execute the patch.
+    deployment:
+      serviceAccountName: observer-agent
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: kagent-tool-server
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - k8s_get_resources
+            - k8s_describe_resource
+            - k8s_get_events
+            - k8s_get_resource_yaml
+            - k8s_get_pod_logs

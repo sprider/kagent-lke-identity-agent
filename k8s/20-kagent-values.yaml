@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=none
+providers:
+  default: openAI
+  openAI:
+    provider: OpenAI
+    model: "gpt-4o"
+    apiKeySecretRef: kagent-openai
+    apiKeySecretKey: OPENAI_API_KEY
+
+controller:
+  auth:
+    mode: trusted-proxy
+
+oauth2-proxy:
+  enabled: true
+  redis:
+    enabled: false
+  sessionStorage:
+    type: cookie
+  config:
+    clientID: "kagent-ui"
+    clientSecret: "<keycloak-client-secret>"
+    cookieSecret: "<oauth2-cookie-secret>"
+  extraEnv:
+    - name: OIDC_ISSUER_URL
+      value: "<keycloak-issuer-url>"
+    - name: OIDC_REDIRECT_URL
+      value: "http://localhost:8080/oauth2/callback"
+    - name: UPSTREAM_URL
+      value: "http://kagent-ui:8080"
+  extraArgs:
+    provider: oidc
+    oidc-issuer-url: "$(OIDC_ISSUER_URL)"
+    redirect-url: "$(OIDC_REDIRECT_URL)"
+    upstream: "$(UPSTREAM_URL)"
+    email-domain: "*"
+    pass-authorization-header: true
+    set-authorization-header: true
+    approval-prompt: "auto"
+    scope: "openid profile email"
+    cookie-secure: "false"
+    cookie-samesite: "lax"
+    skip-jwt-bearer-tokens: true
+    skip-auth-route: "^/(health|login)$"
+    skip-auth-regex: "^/(login|_next/static|_next/image|login-bg\\.(jpg|png|webp)|logo-.*\\.png|favicon\\.ico|api/agentharnesses/.*/gateway).*$"
+    custom-templates-dir: "/templates"
+  service:
+    type: ClusterIP
+    portNumber: 4180
+
+otel:
+  tracing:
+    enabled: true
+    exporter:
+      otlp:
+        endpoint: "http://otel-collector.monitoring:4317"
+        protocol: "grpc"
+        timeout: 15000
+        insecure: true
+  logging:
+    enabled: true
+    exporter:
+      otlp:
+        endpoint: "http://otel-collector.monitoring:4317"
+        timeout: 15000
+        insecure: true
+
+ui:
+  replicas: 1
+
+k8s-agent:
+  enabled: false
+kgateway-agent:
+  enabled: false
+istio-agent:
+  enabled: false
+promql-agent:
+  enabled: false
+observability-agent:
+  enabled: false
+argo-rollouts-agent:
+  enabled: false
+helm-agent:
+  enabled: false
+cilium-policy-agent:
+  enabled: false
+cilium-manager-agent:
+  enabled: false
+cilium-debug-agent:
+  enabled: false

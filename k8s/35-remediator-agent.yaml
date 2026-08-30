@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=none
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: remediator-agent
+  namespace: kagent
+---
+# yaml-language-server: $schema=none
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: remediator-agent
+  namespace: demo
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["endpoints", "pods", "events"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create"]
+---
+# yaml-language-server: $schema=none
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: remediator-agent
+  namespace: demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: remediator-agent
+subjects:
+  - kind: ServiceAccount
+    name: remediator-agent
+    namespace: kagent
+---
+# yaml-language-server: $schema=none
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: remediator-agent-readonly
+  namespace: kagent
+---
+# yaml-language-server: $schema=none
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: remediator-agent-readonly
+  namespace: demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: observer-agent
+subjects:
+  - kind: ServiceAccount
+    name: remediator-agent-readonly
+    namespace: kagent
+---
+# yaml-language-server: $schema=none
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: remediator-agent
+  namespace: kagent
+spec:
+  type: Declarative
+  description: "Remediator with Service patch rights (Alice path)."
+  declarative:
+    modelConfig: default-model-config
+    runtime: python
+    systemMessage: |
+      You remediate namespace demo. When asked, patch frontend-svc so
+      the selector is app=frontend, then verify endpoints. If the API
+      returns 403, report the denial; do not retry with escalated rights.
+    deployment:
+      serviceAccountName: remediator-agent
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: kagent-tool-server
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - k8s_get_resources
+            - k8s_describe_resource
+            - k8s_patch_resource
+            - k8s_get_events
+---
+# yaml-language-server: $schema=none
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: remediator-agent-intern
+  namespace: kagent
+spec:
+  type: Declarative
+  description: "Intern remediator without patch tool (Bob path)."
+  declarative:
+    modelConfig: default-model-config
+    runtime: python
+    systemMessage: |
+      You are an intern remediator for namespace demo. You cannot patch
+      or update resources. If asked to fix a Service, refuse and explain
+      that remediation is denied for this agent. Inspect with get/describe
+      only; never claim a patch succeeded.
+    deployment:
+      serviceAccountName: remediator-agent-readonly
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: kagent-tool-server
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - k8s_get_resources
+            - k8s_describe_resource
+            - k8s_get_events

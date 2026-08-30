@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780"
+     font-family="IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1.5 L8 5 L0 8.5 z" fill="#334155"/>
+    </marker>
+    <marker id="arr-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1.5 L8 5 L0 8.5 z" fill="#047857"/>
+    </marker>
+    <marker id="arr-deny" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1.5 L8 5 L0 8.5 z" fill="#B91C1C"/>
+    </marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#FAFAF8"/>
+
+  <!-- Title -->
+  <text x="600" y="42" text-anchor="middle" font-size="26" font-weight="700" fill="#0F172A">Identity-aware kagent on Akamai LKE</text>
+  <text x="600" y="68" text-anchor="middle" font-size="15" fill="#475569">Same broken Service. Same tools. Different identity → different outcome.</text>
+
+  <!-- Users -->
+  <rect x="40" y="95" width="240" height="110" rx="14" fill="#1E3A5F" stroke="#0F2744" stroke-width="1.5"/>
+  <text x="160" y="128" text-anchor="middle" font-size="13" font-weight="700" fill="#93C5FD">ALICE</text>
+  <text x="160" y="152" text-anchor="middle" font-size="18" font-weight="700" fill="#FFFFFF">platform-engineer</text>
+  <text x="160" y="178" text-anchor="middle" font-size="13" fill="#BFDBFE">can diagnose + fix</text>
+
+  <rect x="300" y="95" width="240" height="110" rx="14" fill="#334155" stroke="#1E293B" stroke-width="1.5"/>
+  <text x="420" y="128" text-anchor="middle" font-size="13" font-weight="700" fill="#CBD5E1">BOB</text>
+  <text x="420" y="152" text-anchor="middle" font-size="18" font-weight="700" fill="#FFFFFF">intern</text>
+  <text x="420" y="178" text-anchor="middle" font-size="13" fill="#E2E8F0">can diagnose only</text>
+
+  <!-- Step 1 arrow into cluster -->
+  <path d="M420 205 L420 245" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+  <text x="435" y="235" font-size="12" font-weight="700" fill="#334155">1 · login</text>
+
+  <!-- LKE cluster frame -->
+  <rect x="40" y="250" width="1120" height="440" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <text x="60" y="278" font-size="12" font-weight="700" letter-spacing="0.08em" fill="#64748B">AKAMAI LKE CLUSTER</text>
+
+  <!-- Row: identity + UI -->
+  <rect x="70" y="300" width="220" height="88" rx="12" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="180" y="335" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">Keycloak</text>
+  <text x="180" y="358" text-anchor="middle" font-size="13" fill="#7F1D1D">OIDC (Alice / Bob)</text>
+  <text x="180" y="376" text-anchor="middle" font-size="11" fill="#9F1233">ns/keycloak</text>
+
+  <path d="M290 344 L340 344" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+  <text x="315" y="332" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">2</text>
+
+  <rect x="340" y="300" width="260" height="88" rx="12" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="470" y="335" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">kagent UI</text>
+  <text x="470" y="358" text-anchor="middle" font-size="13" fill="#047857">via oauth2-proxy</text>
+  <text x="470" y="376" text-anchor="middle" font-size="11" fill="#064E3B">ns/kagent</text>
+
+  <path d="M600 344 L650 344" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+  <text x="625" y="332" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">3</text>
+
+  <rect x="650" y="300" width="220" height="88" rx="12" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="760" y="335" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">Broken Service</text>
+  <text x="760" y="358" text-anchor="middle" font-size="13" fill="#B45309">frontend-svc · 0 endpoints</text>
+  <text x="760" y="376" text-anchor="middle" font-size="11" fill="#78350F">ns/demo</text>
+
+  <!-- Observer -->
+  <path d="M760 388 L760 430" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+  <text x="775" y="418" font-size="12" font-weight="700" fill="#334155">4 · diagnose</text>
+
+  <rect x="620" y="430" width="280" height="72" rx="12" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="760" y="460" text-anchor="middle" font-size="13" font-weight="700" fill="#5B21B6">observer-agent</text>
+  <text x="760" y="482" text-anchor="middle" font-size="12" fill="#6D28D9">read-only ServiceAccount · both users</text>
+
+  <!-- Fork label -->
+  <path d="M760 502 L760 530" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <text x="775" y="524" font-size="12" font-weight="700" fill="#334155">5 · remediate</text>
+
+  <!-- Alice path -->
+  <path d="M760 530 L520 530 L520 555" stroke="#047857" stroke-width="2.5" fill="none" marker-end="url(#arr-ok)"/>
+  <rect x="370" y="555" width="300" height="100" rx="12" fill="#ECFDF5" stroke="#047857" stroke-width="2"/>
+  <text x="520" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">Alice → remediator-agent</text>
+  <text x="520" y="608" text-anchor="middle" font-size="12" fill="#047857">granted k8s_patch_resource tool</text>
+  <text x="520" y="632" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">✓ patch OK · endpoints 0 → 3</text>
+
+  <!-- Bob path -->
+  <path d="M760 530 L1000 530 L1000 555" stroke="#B91C1C" stroke-width="2.5" fill="none" marker-end="url(#arr-deny)"/>
+  <rect x="850" y="555" width="300" height="100" rx="12" fill="#FEF2F2" stroke="#B91C1C" stroke-width="2"/>
+  <text x="1000" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#991B1B">Bob → remediator-agent-intern</text>
+  <text x="1000" y="608" text-anchor="middle" font-size="12" fill="#B91C1C">patch tool not granted</text>
+  <text x="1000" y="632" text-anchor="middle" font-size="14" font-weight="700" fill="#B91C1C">✗ remediation refused</text>
+
+  <!-- Observability strip -->
+  <rect x="70" y="555" width="260" height="100" rx="12" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="200" y="590" text-anchor="middle" font-size="12" font-weight="700" fill="#075985">Jaeger (optional)</text>
+  <text x="200" y="612" text-anchor="middle" font-size="12" fill="#0369A1">OTLP traces</text>
+  <text x="200" y="634" text-anchor="middle" font-size="11" fill="#0C4A6E">ns/monitoring</text>
+
+  <!-- Takeaway -->
+  <rect x="40" y="710" width="1120" height="48" rx="10" fill="#0F172A"/>
+  <text x="600" y="740" text-anchor="middle" font-size="15" fill="#F8FAFC">Guardrail = which tools the agent is granted — Alice can patch; Bob’s intern agent cannot.</text>
+</svg>
